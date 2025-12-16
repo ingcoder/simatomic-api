@@ -1,0 +1,24 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "simatomic-client"
+version = "0.1.0"
+description = "Python client for SimAtomic molecular dynamics analysis platform"
+readme = "README.md"
+requires-python = ">=3.6"
+license = {text = "MIT"}
+authors = [
+    {name = "Ingrid Barbosa-Farias, SimAtomic"}
+]
+dependencies = [
+    "requests>=2.20.0"
+]
+
+[project.urls]
+Homepage = "https://app.simatomic.com"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
