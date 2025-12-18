@@ -35,29 +35,29 @@ class SimAtomicClient:
         self.api_key = api_key
         self.api_base_url = "https://app.simatomic.com/api/api_handler/"
         self.api_endpoint_presigned_url = self.api_base_url + "get_presigned_url"
-        self.api_endpoint_analysis = self.api_base_url + "analyze_trajectory"
-        self.api_endpoint_scw_analysis = self.api_base_url + "analyze_scw_api"
-        self.api_endpoint_mmpbsa = self.api_base_url + "mmpbsa"
-        self.api_endpoint_queue_analysis_job = self.api_base_url + "queue_analysis_job"
+        self.api_endpoint_start_server = self.api_base_url + "start_remote_server"
+        self.api_endpoint_queue_job = self.api_base_url + "queue_job"
         self.api_endpoint_get_job_status = self.api_base_url + "poll_job"
-        self.api_endpoint_batch_simulation = None
         self.filename = None
         self.file_path = None
 
+        # self.api_endpoint_analysis = self.api_base_url + "analyze_trajectory"
+        # self.api_endpoint_mmpbsa = self.api_base_url + "mmpbsa"
+        # self.api_endpoint_batch_simulation = self.api_base_url + "run_simulation"
         print("""
-╔══════════════════════════════════════════════════════════════╗
-║  🧬  SimAtomic Client                                        ║
-╠══════════════════════════════════════════════════════════════╣
-║  Usage:                                                      ║
-║    client.run_job("/path/to/trajectory.zip", config)         ║
-║                                                              ║
-║  Config requires 'mode' key: "analysis" | "mmpbsa"           ║
-║                                                              ║
-║  Example:                                                    ║
-║    config = {"mode": "analysis", "atom_selection": "name CA"}║
-║    client.run_job("trajectory.zip", config)                  ║
-╚══════════════════════════════════════════════════════════════╝
-""")
+        ╔══════════════════════════════════════════════════════════════╗
+        ║  🧬  SimAtomic Client                                        ║
+        ╠══════════════════════════════════════════════════════════════╣
+        ║  Usage:                                                      ║
+        ║    client.run_job("/path/to/trajectory.zip", config)         ║
+        ║                                                              ║
+        ║  Config requires 'mode' key: "analysis" | "mmpbsa"           ║
+        ║                                                              ║
+        ║  Example:                                                    ║
+        ║    config = {"mode": "analysis", "atom_selection": "name CA"}║
+        ║    client.run_job("trajectory.zip", config)                  ║
+        ╚══════════════════════════════════════════════════════════════╝
+        """)
 
     # =============================================================================
     # File Handling
@@ -179,8 +179,8 @@ class SimAtomicClient:
         End to end analysis workflow for a trajectory file. Returns the analysis results dict.
         """
         files_ok = self._validate_and_upload_files(self.api_endpoint_presigned_url, file_path)
-        job_ok, response = self._submit_job(self.api_endpoint_queue_analysis_job, params)
-        results = self._start_job(self.api_endpoint_scw_analysis, None)
+        job_ok, response = self._submit_job(self.api_endpoint_queue_job, params)
+        results = self._start_job(self.api_endpoint_start_server, None)
         return response['message_id']
 
 
@@ -232,9 +232,14 @@ if __name__ == "__main__":
             "rmsd_output_path": "protein_ligand_rmsd_plots.html",
     }
 
+    simulation_parameters = {
+        "mode": "simulation"
+    }
+
 
     analysis_input_path = "path/to/analysis_input.zip"
     mmpbsa_input_path = "path/to/mmpbsa_input.zip"
+    simulation_input_path = "path/to/simulation_input.zip"
     
     client = SimAtomicClient(api_key="1234567890") # options: "mmpbsa", "analysis", "batch_simulation"   
     job_id = client.run_job(mmpbsa_input_path, mmpbsa_parameters)
