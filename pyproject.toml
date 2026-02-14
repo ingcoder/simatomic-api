@@ -13,7 +13,8 @@ authors = [
     {name = "Ingrid Barbosa-Farias, SimAtomic"}
 ]
 dependencies = [
-    "requests>=2.20.0"
+    "requests>=2.20.0",
+    "pyyaml>=5.4.1"
 ]
 
 [project.urls]
@@ -21,4 +22,3 @@ Homepage = "https://app.simatomic.com"
 
 [tool.setuptools.packages.find]
 where = ["src"]
-

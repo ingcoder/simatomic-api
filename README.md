@@ -9,7 +9,8 @@ A Python client for running molecular dynamics analysis and energy calculations 
 ### Requirements
 
 - Python 3.6+
-- `requests` library (automatically installed with the package)
+- `requests` (installed with the package)
+- `pyyaml` (installed with the package)
 
 ### Install from ZIP
 
@@ -24,10 +25,8 @@ pip install simatomic-client.zip
 If you want to modify the source code and have changes reflected immediately:
 
 ```bash
-# From the directory containing the zippped or unzipped simatomic-client folder
-pip install -e simatomic-client/
-or
-pip install -e simatomic-client.zip
+# From the `simatomic-client/` folder
+pip install -e .
 ```
 
 ### Verify Installation
@@ -47,10 +46,11 @@ This example shows the basic workflow. For job configuration details, see **Sect
 
 ```python
 from simatomic_client import SimAtomicClient
+import os
 import time
 
 # Initialize client with your API key
-client = SimAtomicClient(api_key="your-api-key")
+client = SimAtomicClient(api_key=os.environ["SIMATOMIC_API_KEY"])
 
 # Define job configuration (see Section 4 for mode options)
 mmpbsa_parameters = {
@@ -81,10 +81,12 @@ job_id = client.run_job("/path/to/trajectory.zip", mmpbsa_parameters)
 
 # Poll for results (see Section 7 for status codes)
 while True:
-    result = client.poll_job(job_id)
+    result, done_job_id = client.poll_job(job_id)
 
-    if result['job_status'] == "success":
+    if done_job_id:
         print("Job completed!")
+        output_path = client.download_results(job_id)
+        print(f"Downloaded results to: {output_path}")
         break
     elif result['job_status'] == "failed":
         print("Job failed")
@@ -246,7 +248,7 @@ After submitting a job (see **Section 8**), poll for status using `poll_job()`. 
 
 ## 7. Results and Output
 
-When a job completes successfully (status: `success`), the response includes a download link containing the analysis results.
+When a job completes successfully (status: `success`), you can download results with `download_results(job_id)`.
 
 ### 7.1 MM-PBSA Results
 
@@ -272,12 +274,12 @@ For `mode: "analysis"` jobs, the downloaded results folder contains:
 **Example polling with download link:**
 
 ```python
-result = client.poll_job(job_id)
+result, done_job_id = client.poll_job(job_id)
 
-if result['job_status'] == "success":
+if done_job_id:
     print("Job completed successfully!")
-    download_url = result['message']  # Contains the download link
-    print(f"Download results at: {download_url}")
+    output_path = client.download_results(job_id)
+    print(f"Downloaded results to: {output_path}")
 ```
 
 ---
@@ -289,19 +291,20 @@ The `SimAtomicClient` class provides these methods:
 | Method                       | Description                                               |
 | ---------------------------- | --------------------------------------------------------- |
 | `run_job(file_path, config)` | Upload file and start job. Returns `job_id`               |
-| `poll_job(job_id)`           | Check job status. Returns `{job_id, job_status, message}` |
+| `poll_job(job_id)`           | Check job status. Returns `(result_dict, done_job_id_or_None)` |
 
 **Usage:**
 
 ```python
 # Initialize (Section 2)
-client = SimAtomicClient(api_key="your-api-key")
+import os
+client = SimAtomicClient(api_key=os.environ["SIMATOMIC_API_KEY"])
 
 # Submit job with config (Section 4-5) and input file (Section 3)
 job_id = client.run_job("/path/to/input.zip", config)
 
 # Poll until complete (Section 6)
-result = client.poll_job(job_id)
+result, done_job_id = client.poll_job(job_id)
 ```
 
 # simatomic_api

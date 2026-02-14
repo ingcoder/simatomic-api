@@ -1,0 +1,50 @@
+# SimAtomic Configuration Parameters
+# Contains default configuration dictionaries for different job modes
+
+# MM-PBSA Analysis Parameters
+# Used for calculating binding free energies in protein-protein interactions
+mmpbsa_parameters:
+  mode: mmpbsa
+  mmpbsa_stride: 1 # Stride when converting trajectory to NetCDF
+  mmpbsa_startframe: 120 # First frame to analyze
+  mmpbsa_endframe: 1000 # Last frame to analyze
+  mmpbsa_interval: 2 # Interval between analyzed frames
+  igb: 5 # Generalized Born model (5 or 8 common for PPIs)
+
+# Ensemble Analysis Parameters (Alternative mode)
+analysis_parameters:
+  mode: analysis
+  start_frame: 0
+  atom_selection: "name CA" # Atom selection for analysis
+  min_cluster_size: 5 #10 # Minimum cluster size for HDBSCAN
+  min_samples: 1 #10 # Minimum samples for HDBSCAN
+
+simulation_parameters:
+  mode: simulation
+  # Integrator
+  integrator_temperature: 300.0
+  integrator_friction: 1.0
+  integrator_timestep: 0.004
+  # Solvation
+  solv_box_buffer: 1.3 # nm
+  solv_ionic_strength: 0.15 # molar
+  solv_positive_ion: "Na+" # Allowed values: 'Cs+', 'K+', 'Li+', 'Na+', 'Rb+'
+  solv_negative_ion: "Cl-" # Allowed values: 'Cl-', 'Br-', 'F-', 'I-'
+  solv_model: "tip3p" # Supported values: 'tip3p', 'spce', 'tip4pew', 'tip5p'
+  solv_pH: 7.0 # pH of the solvent
+  # MD Simulation
+  md_steps: 2500000 #25000000
+  md_save_interval: 5000
+  md_pressure: 1.0
+  md_barostat_freq: 25
+  md_harmonic_restraint: false
+  md_restrained_residues: []
+  md_force_constant: 100
+  md_npt: false
+  # Energy minimization
+  emin_steps: 20000
+  emin_harmonic_restraint: true
+  emin_restrained_residues: []
+  emin_force_constant: 50 # Reduced from 200 - gentler restraints
+  emin_max_iterations: 50000 # Increased from 10000 for better convergence
+  use_hmr: true
